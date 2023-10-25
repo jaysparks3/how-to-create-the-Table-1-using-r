@@ -46,16 +46,100 @@ tab1
 
 library(readr)
 rotator_wide_df_master_87 <- read_csv("G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_wide_df_master_87.csv")
+rotator_wide_df_master_89 <- read_csv("G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_wide_df_master_89.csv") 
+
+ 
 
 # convert long data
 tab_rf_long <- rotator_wide_df_master_87 %>% 
-    select(age_g, bmi_g, gender,  "Day_0" = TW_D_0, "Day_30" = TW_D_30,"Day_90" = TW_D_90 ) %>% 
-    pivot_longer(c(4:6), names_to = "Intervals", values_to = "Scores")
+    select("Age"=  age, "Age_group" = age_g, "BMI"= bmi,"BMI_group"= bmi_g,"Gender"= gender, 
+         "NPRS_Day_0"= nprs_initial,"NPRS_Day_30"=  nprs_day_30, "NPRS_Day_90"= nprs_day_90,
+           "WOMAC_Day_0" = TW_D_0, "WOMAC_Day_30" = TW_D_30,"WOMAC_Day_90" = TW_D_90,
+         "Pain_Day_0"= womac_pain_0,"Pain_Day_30"= womac_pain_30,"Pain_Day_90"= womac_pain_90,
+         "Stiffness_Day_0"= womac_stiff_0, "Stiffness_Day_30"=womac_stiff_30, "Stiffness_Day_90"=womac_stiff_90,  
+"function_Day_0" = womac_func_0,"function_Day_30" =  womac_func_30, "function_Day_90" = womac_func_90, 
+ "QOLS_Day_0"= sub_sums_qols_0,"QOLS_Day_30"= sub_sums_qols_30,"QOLS_Day_90"= sub_sums_qols_90)
+
+#tab_rf <- table1(~ age_g + bmi_g + gender  + Scores | Intervals, data = tab_rf_long)
+
+tab_rf2 <- table1(~ ., data = tab_rf_long)
+
+write.csv(tab_rf2, "G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_cuff_table1.csv")
 
 
-tab_rf <- table1(~ age_g + bmi_g + gender  + Scores | Intervals, data = tab_rf_long)
 
-tab_rf2 <- table1(~ age + age_g +bmi + bmi_g + gender  + TW_D_0 + TW_D_30 + TW_D_90, data = rotator_wide_df_master_87)
+```
+
+```{r average changes in rotator cuff pain scale}
+
+rf_cs_df <- rotator_wide_df_master_87 %>% 
+    select(#"Age"=  age, "Age_group" = age_g, "BMI"= bmi,"BMI_group"= bmi_g,"Gender"= gender, 
+#          "NPRS_Day_0"= nprs_initial,"NPRS_Day_30"=  nprs_day_30, "NPRS_Day_90"= nprs_day_90,
+#            "WOMAC_Day_0" = TW_D_0, "WOMAC_Day_30" = TW_D_30,"WOMAC_Day_90" = TW_D_90,
+#          "Pain_Day_0"= womac_pain_0,"Pain_Day_30"= womac_pain_30,"Pain_Day_90"= womac_pain_90,
+#          "Stiffness_Day_0"= womac_stiff_0, "Stiffness_Day_30"=womac_stiff_30, "Stiffness_Day_90"=womac_stiff_90,  
+# "function_Day_0" = womac_func_0,"function_Day_30" =  womac_func_30, "function_Day_90" = womac_func_90, 
+#  "QOLS_Day_0"= sub_sums_qols_0,"QOLS_Day_30"= sub_sums_qols_30,"QOLS_Day_90"= sub_sums_qols_90)
+ nprs_initial,nprs_day_30,nprs_day_90,
+32:46) %>%
+    mutate(nprsa = nprs_initial-nprs_day_30, nprsb = nprs_day_30 - nprs_day_90, nprsc = nprs_initial-nprs_day_90) %>% 
+    select(-nprs_initial,-nprs_day_30,-nprs_day_90)
+
+tab_rf3 <- table1(~ ., data = rf_cs_df)
+
+write.csv(tab_rf3, "G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_cuff_table1_1.csv")
+
+
+
+```
+
+```{r}
+
+rf_cs_df_mcid <- rotator_wide_df_master_87 %>% 
+    select("Age"=  age, "Age_group" = age_g, "BMI"= bmi,"BMI_group"= bmi_g,"Gender"= gender, 
+         "NPRS_Day_0"= nprs_initial,"NPRS_Day_30"=  nprs_day_30, "NPRS_Day_90"= nprs_day_90,
+           "WOMAC_Day_0" = TW_D_0, "WOMAC_Day_30" = TW_D_30,"WOMAC_Day_90" = TW_D_90) %>% 
+    mutate(diff=WOMAC_Day_90-WOMAC_Day_0) %>% 
+    mutate(Exceed_MCID = ifelse(diff <= -10, "Yes","No"))
+
+ 
+#library(furniture)
+#tab_rf3_mcid2 <- furniture::table1( rf_cs_df_mcid, Gender, Age_group ,BMI_group, splitby = ~Exceed_MCID,  row_wise = T)
+
+write.csv(tab_rf3_mcid2, "G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_cuff_table1_mcid.csv")
+tab_rf3_mcid2
+
+
+```
+
+
+### hips dataset
+
+```{r}
+
+library(readr)
+hips_data <- read_csv("G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/hips_wide_df_master.csv")
+ 
+hips_t1_df <- hips_data %>% 
+    select("Age"=  age, "Age_group" = age_g, "BMI"= bmi,"BMI_group"= bmi_g,"Gender"= gender, 
+         "NPRS_Day_0"= nprs_initial,"NPRS_Day_30"=  nprs_day_30, "NPRS_Day_90"= nprs_day_90,
+           "WOMAC_Day_0" = TW_D_0, "WOMAC_Day_30" = TW_D_30,"WOMAC_Day_90" = TW_D_90,
+         "Pain_Day_0"= womac_pain_0,"Pain_Day_30"= womac_pain_30,"Pain_Day_90"= womac_pain_90,
+         "Stiffness_Day_0"= womac_stiff_0, "Stiffness_Day_30"=womac_stiff_30, "Stiffness_Day_90"=womac_stiff_90,  
+"function_Day_0" = womac_func_0,"function_Day_30" =  womac_func_30, "function_Day_90" = womac_func_90, 
+ "QOLS_Day_0"= sub_sums_qols_0,"QOLS_Day_30"= sub_sums_qols_30,"QOLS_Day_90"= sub_sums_qols_90) %>% 
+    mutate(diff=WOMAC_Day_90-WOMAC_Day_0) %>% 
+    mutate(Exceed_MCID = ifelse(diff <= -14.67, "Yes","No"))
+library(furniture)
+hips_t1_df_mcid2 <- furniture::table1( hips_t1_df, Gender, Age_group ,BMI_group, splitby = ~Exceed_MCID,  row_wise = T)
+
+  
+library(furniture)
+tab_hips2 <-  furniture::table1( hips_t1_df, Gender, Age_group ,BMI_group,  row_wise = T)
+# library(table1)
+#  tab_tt <- table1::table1(~ ., data = hips_t1_df) #-14.67
+
+write.csv(hips_t1_df_mcid2, "G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/hips_table1_mcid.csv")
 
 
 ```
