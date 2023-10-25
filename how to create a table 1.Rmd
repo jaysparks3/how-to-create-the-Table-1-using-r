@@ -1,0 +1,62 @@
+---
+title: "how to create a table 1"
+author: "Jay Kim"
+date: "2023-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+
+
+library(boot) 
+
+melanoma2 <- melanoma
+ 
+# Factor the basic variables that
+# we're interested in
+melanoma2$status <- 
+  factor(melanoma2$status, 
+         levels=c(2,1,3),
+         labels=c("Alive", # Reference
+                  "Melanoma death", 
+                  "Non-melanoma death"))
+
+melanoma2
+```
+
+
+```{r}
+library(tidyr)
+library(knitr)
+library(table1)
+
+tab1 <- table1(~ factor(sex) + age + factor(ulcer) + thickness | status, data=melanoma2)
+
+tab1
+```
+### using example dataset
+
+```{r}
+
+library(readr)
+rotator_wide_df_master_87 <- read_csv("G:/Shared drives/HMCSE-PAM Lab/Jay's Space/2023 Active Projects/08/Regenative Labs 2023/rotator_wide_df_master_87.csv")
+
+# convert long data
+tab_rf_long <- rotator_wide_df_master_87 %>% 
+    select(age_g, bmi_g, gender,  "Day_0" = TW_D_0, "Day_30" = TW_D_30,"Day_90" = TW_D_90 ) %>% 
+    pivot_longer(c(4:6), names_to = "Intervals", values_to = "Scores")
+
+
+tab_rf <- table1(~ age_g + bmi_g + gender  + Scores | Intervals, data = tab_rf_long)
+
+tab_rf2 <- table1(~ age + age_g +bmi + bmi_g + gender  + TW_D_0 + TW_D_30 + TW_D_90, data = rotator_wide_df_master_87)
+
+
+```
+
